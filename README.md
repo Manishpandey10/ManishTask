@@ -1,0 +1,2 @@
+-This is the simple integration of login and register in React+Typescript .
+-Used a simple mongoDb collection on my personal account to register the user 
