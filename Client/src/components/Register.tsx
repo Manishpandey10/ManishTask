@@ -8,10 +8,10 @@ type RegisterResponse = { message: string };
 type ErrorResponse = { error: string };
 
 const Register = () => {
+  const [name, setName] = useState<string>("");
   const [email, setEmail] = useState<string>("");
   const [password, setPassword] = useState<string>("");
-    const navigate = useNavigate();
-
+  const navigate = useNavigate();
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -20,6 +20,7 @@ const Register = () => {
       const res = await axios.post<RegisterResponse>(
         "http://localhost:5000/register",
         {
+          name,
           email,
           password,
         }
@@ -50,6 +51,23 @@ const Register = () => {
 
       <div className="mt-10 sm:mx-auto sm:w-full sm:max-w-sm">
         <form onSubmit={handleSubmit} className="space-y-6">
+          <div>
+            <label
+              htmlFor="name"
+              className="block text-sm font-medium text-gray-100"
+            >
+              User Name
+            </label>
+            <input
+              id="name"
+              type="name"
+              name="name"
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+              required
+              className="mt-2 block w-full rounded-md bg-white/5 px-3 py-1.5 text-base text-white"
+            />
+          </div>
           <div>
             <label
               htmlFor="email"
