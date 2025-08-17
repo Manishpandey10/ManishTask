@@ -8,7 +8,7 @@ function App() {
     <Router>
       <nav className="flex gap-4 p-4 bg-gray-800 text-white">
         <Link to="/login">Login</Link>
-        <Link to="/register">Register</Link>
+        <Link to="/">Register</Link>
       </nav>
 
       <Routes>
