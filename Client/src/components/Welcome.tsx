@@ -2,18 +2,18 @@ import { useNavigate } from "react-router-dom";
 import axios from "axios";
 
 const Welcome = () => {
-  const navigate = useNavigate();
+  // const navigate = useNavigate();
 
-  const handleLogout = async () => {
-    try {
-      await axios.post("http://localhost:5000/logout");
-      localStorage.removeItem("user"); // clear local storage
-      navigate("/login"); // redirect after successful logout
-    } catch (err) {
-      console.error("Logout failed", err);
-      alert("Logout failed");
-    }
-  };
+  // const handleLogout = async () => {
+  //   try {
+  //     await axios.post("http://localhost:5000/logout");
+  //     localStorage.removeItem("user"); // clear local storage
+  //     navigate("/login"); // redirect after successful logout
+  //   } catch (err) {
+  //     console.error("Logout failed", err);
+  //     alert("Logout failed");
+  //   }
+  // };
 
   return (
     <div className="min-h-screen flex flex-col items-center justify-center bg-gray-900 text-white">
