@@ -96,7 +96,7 @@ const Register = () => {
     setIsSubmitting(true);
 
     try {
-      const res = await axios.post<RegisterResponse>(
+      await axios.post<RegisterResponse>(
         "http://localhost:5000/register",
         {
           name: name.trim(),
