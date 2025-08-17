@@ -3,6 +3,7 @@ import mongoose, { Schema, type Document } from "mongoose";
 import bcrypt from "bcryptjs";
 import cors from "cors";
 import bodyParser from "body-parser";
+import jwt from "jsonwebtoken";
 
 const app = express();
 const PORT = 5000;
@@ -43,7 +44,11 @@ const User = mongoose.model<IUser>("User", UserSchema);
 // ================== Validation Functions ==================
 const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
 
-const validateRegisterInput = (name: string, email: string, password: string) => {
+const validateRegisterInput = (
+  name: string,
+  email: string,
+  password: string
+) => {
   const errors: { name?: string; email?: string; password?: string } = {};
 
   // Name validation
@@ -73,7 +78,7 @@ const validateRegisterInput = (name: string, email: string, password: string) =>
 
   return {
     isValid: Object.keys(errors).length === 0,
-    errors
+    errors,
   };
 };
 
@@ -94,7 +99,7 @@ const validateLoginInput = (email: string, password: string) => {
 
   return {
     isValid: Object.keys(errors).length === 0,
-    errors
+    errors,
   };
 };
 
@@ -107,7 +112,9 @@ app.post("/register", async (req: Request, res: Response): Promise<void> => {
   // Input validation
   const validation = validateRegisterInput(name, email, password);
   if (!validation.isValid) {
-    res.status(400).json({ error: "Validation failed", details: validation.errors });
+    res
+      .status(400)
+      .json({ error: "Validation failed", details: validation.errors });
     return;
   }
 
@@ -130,28 +137,27 @@ app.post("/register", async (req: Request, res: Response): Promise<void> => {
     }
 
     const hashedPassword = await bcrypt.hash(password, 12);
-    const user = new User({ 
-      name: trimmedName, 
-      email: trimmedEmail, 
-      password: hashedPassword 
+    const user = new User({
+      name: trimmedName,
+      email: trimmedEmail,
+      password: hashedPassword,
     });
-    
+
     await user.save();
 
-    res.status(201).json({ 
+    res.status(201).json({
       message: "User registered successfully",
-      user: { name: user.name, email: user.email }
+      user: { name: user.name, email: user.email },
     });
-
   } catch (err: any) {
     console.error("Register error:", err);
 
     // Handle MongoDB duplicate key errors
     if (err.code === 11000) {
       const duplicateField = Object.keys(err.keyPattern)[0];
-      if (duplicateField === 'email') {
+      if (duplicateField === "email") {
         res.status(400).json({ error: "User with this email already exists" });
-      } else if (duplicateField === 'name') {
+      } else if (duplicateField === "name") {
         res.status(400).json({ error: "Username is already taken" });
       } else {
         res.status(400).json({ error: "User already exists" });
@@ -160,12 +166,14 @@ app.post("/register", async (req: Request, res: Response): Promise<void> => {
     }
 
     // Handle validation errors
-    if (err.name === 'ValidationError') {
+    if (err.name === "ValidationError") {
       const validationErrors: any = {};
       Object.keys(err.errors).forEach((key) => {
         validationErrors[key] = err.errors[key].message;
       });
-      res.status(400).json({ error: "Validation failed", details: validationErrors });
+      res
+        .status(400)
+        .json({ error: "Validation failed", details: validationErrors });
       return;
     }
 
@@ -180,7 +188,9 @@ app.post("/login", async (req: Request, res: Response): Promise<void> => {
   // Input validation
   const validation = validateLoginInput(email, password);
   if (!validation.isValid) {
-    res.status(400).json({ error: "Validation failed", details: validation.errors });
+    res
+      .status(400)
+      .json({ error: "Validation failed", details: validation.errors });
     return;
   }
 
@@ -198,12 +208,19 @@ app.post("/login", async (req: Request, res: Response): Promise<void> => {
       res.status(400).json({ error: "Invalid email or password" });
       return;
     }
-
-    res.json({ 
-      message: "🎉 Login successful",
-      user: { name: user.name, email: user.email }
+    // Generate token
+    const token = jwt.sign({ id: user._id }, "secret_key", { expiresIn: "1h" });
+    // Send token in HTTP-only cookie
+    res.cookie("token", token, {
+      httpOnly: true,
+      secure: false, // set true in production with HTTPS
+      sameSite: "strict",
     });
 
+    res.json({
+      message: "🎉 Login successful",
+      user: { name: user.name, email: user.email },
+    });
   } catch (err) {
     console.error("Login error:", err);
     res.status(500).json({ error: "Something went wrong while logging in" });
@@ -211,15 +228,16 @@ app.post("/login", async (req: Request, res: Response): Promise<void> => {
 });
 
 // Logout Route
-app.post("/logout", (req: Request, res: Response): void => {
-  res.json({ message: "👋 User logged out successfully" });
+app.post("/logout", (req: Request, res: Response) => {
+  res.clearCookie("token");
+  res.json({ message: "👋 Logged out successfully" });
 });
 
 // User details route - Simple version using email from request body
 app.post("/me", async (req: Request, res: Response): Promise<void> => {
   try {
     const { email } = req.body;
-    
+
     if (!email || !email.trim()) {
       res.status(400).json({ error: "Email is required" });
       return;
@@ -230,7 +248,9 @@ app.post("/me", async (req: Request, res: Response): Promise<void> => {
       return;
     }
 
-    const user = await User.findOne({ email: email.trim().toLowerCase() }).select('name email'); 
+    const user = await User.findOne({
+      email: email.trim().toLowerCase(),
+    }).select("name email");
     if (!user) {
       res.status(404).json({ error: "User not found" });
       return;
@@ -238,25 +258,28 @@ app.post("/me", async (req: Request, res: Response): Promise<void> => {
 
     res.json({ name: user.name, email: user.email });
   } catch (err) {
-    console.error('Error fetching user:', err);
-    res.status(500).json({ error: 'Server error' });
+    console.error("Error fetching user:", err);
+    res.status(500).json({ error: "Server error" });
   }
 });
 
 // Health check route
 app.get("/health", (req: Request, res: Response): void => {
-  res.json({ status: "Server is running", timestamp: new Date().toISOString() });
+  res.json({
+    status: "Server is running",
+    timestamp: new Date().toISOString(),
+  });
 });
 
 // ================== Error Handling Middleware ==================
 app.use((err: Error, req: Request, res: Response, next: any) => {
-  console.error('Unhandled error:', err);
-  res.status(500).json({ error: 'Internal server error' });
+  console.error("Unhandled error:", err);
+  res.status(500).json({ error: "Internal server error" });
 });
 
 // Handle 404 routes
 app.use((req: Request, res: Response) => {
-  res.status(404).json({ error: 'Route not found' });
+  res.status(404).json({ error: "Route not found" });
 });
 
 // ================== Start Server ==================
