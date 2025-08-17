@@ -18,12 +18,12 @@ const Welcome = () => {
   return (
     <div className="min-h-screen flex flex-col items-center justify-center bg-gray-900 text-white">
       <h1 className="text-3xl font-bold mb-6">🎉 Welcome! Userrrrr</h1>
-      <button
+      {/* <button
         onClick={handleLogout}
         className="px-4 py-2 bg-red-500 hover:bg-red-600 rounded-md text-white font-semibold"
       >
         Logout
-      </button>
+      </button> */}
     </div>
   );
 };
