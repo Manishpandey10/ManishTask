@@ -14,7 +14,7 @@ app.use(
   cors({
     origin: [
       "http://localhost:5173",               // local dev
-      "https://manish-task.vercel.app/",    // deployed frontend
+      "https://manish-task.vercel.app",    // deployed frontend
     ],
     methods: ["GET", "POST"],
     credentials: true,
