@@ -23,7 +23,7 @@ npm install
 
 
 # running backend server locally 
-cd server
+cd src/server
 npm start
 
 #running frontend locally 
