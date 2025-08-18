@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "type": "commonjs",
   "scripts": {
-    "dev":"ts-node-dev src/server.ts",
+    "dev": "ts-node-dev src/server.ts",
     "build": "tsc",
     "start": "node dist/server.js"
   },
@@ -16,6 +16,7 @@
     "body-parser": "^2.2.0",
     "cookie-parser": "^1.4.7",
     "cors": "^2.8.5",
+    "dotenv": "^17.2.1",
     "express": "^5.1.0",
     "jsonwebtoken": "^9.0.2",
     "mongoose": "^8.17.1"
