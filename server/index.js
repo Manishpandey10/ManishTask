@@ -48,7 +48,7 @@ app.use((0, cors_1.default)());
 app.use(body_parser_1.default.json());
 // MongoDB Connection
 mongoose_1.default
-    .connect("mongodb://127.0.0.1:27017/loginApp")
+    .connect("mongodb+srv://admin:admin123@cluster0expmanish.izoem.mongodb.net/")
     .then(function () { return console.log("MongoDB Connected"); })
     .catch(function (err) { return console.log(err); });
 var UserSchema = new mongoose_1.Schema({
