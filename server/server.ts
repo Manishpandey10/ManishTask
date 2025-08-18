@@ -11,12 +11,17 @@ const PORT = 5000;
 // ================== Middleware ==================
 app.use(
   cors({
-    origin: "http://localhost:5173", // React app
+    origin: [
+      "http://localhost:5173",               // local dev
+      "https://manish-task.vercel.app/",    // deployed frontend
+    ],
     methods: ["GET", "POST"],
     credentials: true,
   })
 );
+
 app.use(bodyParser.json());
+
 
 // ================== MongoDB Connection ==================
 mongoose
