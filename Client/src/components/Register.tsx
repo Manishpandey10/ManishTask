@@ -97,7 +97,7 @@ const Register = () => {
 
     try {
       await axios.post<RegisterResponse>(
-        "http://localhost:5000/register",
+        "https://server-gn9a.onrender.com/register",
         {
           name: name.trim(),
           email: email.trim().toLowerCase(),

@@ -80,7 +80,7 @@ const Login = () => {
     setIsSubmitting(true);
 
     try {
-      const res = await axios.post<LoginResponse>("http://localhost:5000/login", {
+      const res = await axios.post<LoginResponse>("https://server-gn9a.onrender.com/login", {
         email: email.trim().toLowerCase(),
         password,
       });
