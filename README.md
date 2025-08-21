@@ -8,8 +8,6 @@ A modern, secure authentication system built with **React, TypeScript, Node.js, 
 
 - **Frontend (Vercel):** [https://manish-task.vercel.app/](https://manish-task.vercel.app/)  
 - **Backend (Render - Free Tier ⚠️ may take a while to spin up):** [https://server-gn9a.onrender.com](https://server-gn9a.onrender.com)
-- i know I have hardcoded the connection string which is not good practice but it was done to make online deployment of backend service work
-
 ---
 
 ## 📦 Installation & Local Setup
