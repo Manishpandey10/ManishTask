@@ -42,18 +42,22 @@ var bcryptjs_1 = require("bcryptjs");
 var cors_1 = require("cors");
 var body_parser_1 = require("body-parser");
 var jsonwebtoken_1 = require("jsonwebtoken");
+var cookie_parser_1 = require("cookie-parser");
+var dotenv_1 = require("dotenv");
+dotenv_1.default.config();
 var app = (0, express_1.default)();
-var PORT = 5000;
+var PORT = process.env.PORT || 5000;
 // ================== Middleware ==================
 app.use((0, cors_1.default)({
-    origin: "http://localhost:5173", // React app
+    origin: ["http://localhost:5173", "https://manish-task.vercel.app", "https://vercel.com/manishpandey10s-projects"],
     methods: ["GET", "POST"],
     credentials: true,
 }));
+app.use((0, cookie_parser_1.default)());
 app.use(body_parser_1.default.json());
 // ================== MongoDB Connection ==================
 mongoose_1.default
-    .connect("mongodb+srv://admin:admin123@cluster0expmanish.izoem.mongodb.net/User?retryWrites=true&w=majority&appName=Cluster0ExpManish")
+    .connect(process.env.MONGO_URI)
     .then(function () { return console.log("✅ MongoDB Connected"); })
     .catch(function (err) { return console.error("DB Error:", err); });
 var UserSchema = new mongoose_1.Schema({
@@ -246,8 +250,8 @@ app.post("/login", function (req, res) { return __awaiter(void 0, void 0, void 0
                 return [3 /*break*/, 5];
             case 4:
                 err_2 = _b.sent();
-                console.error("Login error:", err_2);
-                res.status(500).json({ error: "Something went wrong while logging in" });
+                console.error("Register error:", err_2);
+                res.status(500).json({ error: "Something went wrong while registering" });
                 return [3 /*break*/, 5];
             case 5: return [2 /*return*/];
         }
@@ -311,6 +315,4 @@ app.use(function (req, res) {
     res.status(404).json({ error: "Route not found" });
 });
 // ================== Start Server ==================
-app.listen(PORT, function () {
-    return console.log("\uD83D\uDE80 Server running on http://localhost:".concat(PORT));
-});
+app.listen(PORT, function () { return console.log("\uD83D\uDE80 Server running on port ".concat(PORT)); });

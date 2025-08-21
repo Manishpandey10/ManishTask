@@ -7,22 +7,17 @@ import jwt from "jsonwebtoken";
 import cookieParser from "cookie-parser";
 import dotenv from "dotenv";
 
-
-
 dotenv.config();
 
 const app = express();
 const PORT = process.env.PORT || 5000;
 
-
-
-
 // ================== Middleware ==================
 app.use(
   cors({
-    origin: ["http://localhost:5173",
-    "https://manish-task.vercel.app"],
     
+    origin: ["http://localhost:5173", "https://manish-task.vercel.app","https://vercel.com/manishpandey10s-projects"],
+
     methods: ["GET", "POST"],
     credentials: true,
   })
@@ -34,9 +29,7 @@ app.use(bodyParser.json());
 
 // ================== MongoDB Connection ==================
 mongoose
-  .connect(
-       process.env.MONGO_URI as string
-  )
+  .connect(process.env.MONGO_URI as string)
   .then(() => console.log("✅ MongoDB Connected"))
   .catch((err) => console.error("DB Error:", err));
 
@@ -235,10 +228,11 @@ app.post("/login", async (req: Request, res: Response): Promise<void> => {
       message: "🎉 Login successful",
       user: { name: user.name, email: user.email },
     });
-  } catch (err) {
-    console.error("Login error:", err);
-    res.status(500).json({ error: "Something went wrong while logging in" });
-  }
+  }  catch (err: any) {
+  console.error("Register error:", err);
+  res.status(500).json({ error: "Something went wrong while registering" });
+}
+
 });
 
 // Logout Route
@@ -297,6 +291,4 @@ app.use((req: Request, res: Response) => {
 });
 
 // ================== Start Server ==================
-app.listen(PORT, () =>
-  console.log(`🚀 Server running on port ${PORT}`)
-);
+app.listen(PORT, () => console.log(`🚀 Server running on port ${PORT}`));
