@@ -109,7 +109,7 @@ const Register = () => {
       setErrors({ general: "Registration successful! Redirecting..." });
       
       setTimeout(() => {
-        navigate("/login");
+        navigate("/login",{ state: { email } });
       }, 1500);
 
       // Clear form

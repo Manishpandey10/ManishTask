@@ -1,23 +1,25 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import axios, { AxiosError } from "axios";
+import { useLocation } from "react-router-dom";
 import { useNavigate } from "react-router-dom";
 import "../App.css";
 
-type LoginResponse = { 
+type LoginResponse = {
   message: string;
   user?: { name: string; email: string };
 };
-type ErrorResponse = { 
-  error: string; 
-  details?: { 
-    email?: string; 
-    password?: string; 
-  }; 
+type ErrorResponse = {
+  error: string;
+  details?: {
+    email?: string;
+    password?: string;
+  };
 };
 
 const Login = () => {
-  
-  const [email, setEmail] = useState<string>("");
+  const location = useLocation();
+  const prefilledEmail = (location.state as { email?: string })?.email || "";
+  const [email, setEmail] = useState<string>(prefilledEmail);
   const [password, setPassword] = useState<string>("");
   const [errors, setErrors] = useState<{
     email?: string;
@@ -26,6 +28,12 @@ const Login = () => {
   }>({});
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
   const navigate = useNavigate();
+
+  useEffect(() => {
+    if (prefilledEmail) {
+      setEmail(prefilledEmail);
+    }
+  }, [prefilledEmail]);
 
   // Email regex pattern (same as register)
   const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
@@ -52,19 +60,19 @@ const Login = () => {
   const handleInputChange = (field: string, value: string) => {
     // Clear specific field error when user starts typing
     if (errors[field as keyof typeof errors]) {
-      setErrors(prev => ({
+      setErrors((prev) => ({
         ...prev,
         [field]: undefined,
-        general: undefined
+        general: undefined,
       }));
     }
 
     // Update field value
     switch (field) {
-      case 'email':
+      case "email":
         setEmail(value);
         break;
-      case 'password':
+      case "password":
         setPassword(value);
         break;
     }
@@ -81,10 +89,13 @@ const Login = () => {
     setIsSubmitting(true);
 
     try {
-      const res = await axios.post<LoginResponse>("https://server-gn9a.onrender.com/login", {
-        email: email.trim().toLowerCase(),
-        password,
-      });
+      const res = await axios.post<LoginResponse>(
+        "https://server-gn9a.onrender.com/login",
+        {
+          email: email.trim().toLowerCase(),
+          password,
+        }
+      );
 
       // Store user data in localStorage
       if (res.data.user) {
@@ -97,27 +108,31 @@ const Login = () => {
       setTimeout(() => {
         navigate("/welcome");
       }, 1000);
-
     } catch (error) {
       const err = error as AxiosError<ErrorResponse>;
       const errorData = err.response?.data;
-      
+
       if (errorData?.details) {
         // Handle validation errors with details
         const newErrors: typeof errors = {};
         if (errorData.details.email) newErrors.email = errorData.details.email;
-        if (errorData.details.password) newErrors.password = errorData.details.password;
+        if (errorData.details.password)
+          newErrors.password = errorData.details.password;
         setErrors(newErrors);
       } else {
         // Handle single error messages
         const errorMessage = errorData?.error || "Something went wrong";
-        
+
         // Check for specific server errors
-        if (errorMessage.toLowerCase().includes('email') && 
-            !errorMessage.toLowerCase().includes('password')) {
+        if (
+          errorMessage.toLowerCase().includes("email") &&
+          !errorMessage.toLowerCase().includes("password")
+        ) {
           setErrors({ email: errorMessage });
-        } else if (errorMessage.toLowerCase().includes('password') && 
-                   !errorMessage.toLowerCase().includes('email')) {
+        } else if (
+          errorMessage.toLowerCase().includes("password") &&
+          !errorMessage.toLowerCase().includes("email")
+        ) {
           setErrors({ password: errorMessage });
         } else {
           // For "Invalid email or password" type messages, show as general error
@@ -146,18 +161,23 @@ const Login = () => {
         <form onSubmit={handleSubmit} className="space-y-6">
           {/* General error message */}
           {errors.general && (
-            <div className={`text-sm text-center p-2 rounded-md ${
-              errors.general.includes('successful') 
-                ? 'text-green-400 bg-green-900/20' 
-                : 'text-red-400 bg-red-900/20'
-            }`}>
+            <div
+              className={`text-sm text-center p-2 rounded-md ${
+                errors.general.includes("successful")
+                  ? "text-green-400 bg-green-900/20"
+                  : "text-red-400 bg-red-900/20"
+              }`}
+            >
               {errors.general}
             </div>
           )}
 
           {/* Email Field */}
           <div>
-            <label htmlFor="email" className="block text-sm font-medium text-gray-100">
+            <label
+              htmlFor="email"
+              className="block text-sm font-medium text-gray-100"
+            >
               Email address
             </label>
             <input
@@ -165,11 +185,11 @@ const Login = () => {
               type="email"
               name="email"
               value={email}
-              onChange={(e) => handleInputChange('email', e.target.value)}
+              onChange={(e) => handleInputChange("email", e.target.value)}
               className={`mt-2 block w-full rounded-md bg-white/5 px-3 py-1.5 text-base text-white border ${
-                errors.email 
-                  ? 'border-red-500 focus:border-red-500' 
-                  : 'border-transparent focus:border-indigo-500'
+                errors.email
+                  ? "border-red-500 focus:border-red-500"
+                  : "border-transparent focus:border-indigo-500"
               } focus:outline-none focus:ring-2 focus:ring-indigo-500/20`}
               placeholder="Enter your email"
             />
@@ -180,7 +200,10 @@ const Login = () => {
 
           {/* Password Field */}
           <div>
-            <label htmlFor="password" className="block text-sm font-medium text-gray-100">
+            <label
+              htmlFor="password"
+              className="block text-sm font-medium text-gray-100"
+            >
               Password
             </label>
             <input
@@ -188,11 +211,11 @@ const Login = () => {
               type="password"
               name="password"
               value={password}
-              onChange={(e) => handleInputChange('password', e.target.value)}
+              onChange={(e) => handleInputChange("password", e.target.value)}
               className={`mt-2 block w-full rounded-md bg-white/5 px-3 py-1.5 text-base text-white border ${
-                errors.password 
-                  ? 'border-red-500 focus:border-red-500' 
-                  : 'border-transparent focus:border-indigo-500'
+                errors.password
+                  ? "border-red-500 focus:border-red-500"
+                  : "border-transparent focus:border-indigo-500"
               } focus:outline-none focus:ring-2 focus:ring-indigo-500/20`}
               placeholder="Enter your password"
             />
@@ -207,20 +230,20 @@ const Login = () => {
               disabled={isSubmitting}
               className={`flex w-full justify-center rounded-md px-3 py-1.5 text-sm font-semibold text-white ${
                 isSubmitting
-                  ? 'bg-gray-500 cursor-not-allowed'
-                  : 'bg-indigo-500 hover:bg-indigo-400 focus:outline-none focus:ring-2 focus:ring-indigo-500/20'
+                  ? "bg-gray-500 cursor-not-allowed"
+                  : "bg-indigo-500 hover:bg-indigo-400 focus:outline-none focus:ring-2 focus:ring-indigo-500/20"
               } transition-colors duration-200`}
             >
-              {isSubmitting ? 'Signing in...' : 'Sign in'}
+              {isSubmitting ? "Signing in..." : "Sign in"}
             </button>
           </div>
         </form>
 
         {/* Register link */}
         <p className="mt-10 text-center text-sm text-gray-400">
-          Don't have an account?{' '}
+          Don't have an account?{" "}
           <button
-            onClick={() => navigate('/')}
+            onClick={() => navigate("/")}
             className="font-semibold text-indigo-400 hover:text-indigo-300 transition-colors"
           >
             Register here
