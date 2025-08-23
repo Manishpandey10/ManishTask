@@ -6,7 +6,7 @@ const Welcome = () => {
 
   const handleLogout = async () => {
     try {
-      await axios.post("http://localhost:5000/logout");
+      await axios.post("https://server-gn9a.onrender.com/logout");
       localStorage.removeItem("user"); // clear local storage
       navigate("/login"); // redirect after successful logout
     } catch (err) {
