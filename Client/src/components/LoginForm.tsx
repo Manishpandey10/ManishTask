@@ -94,7 +94,8 @@ const Login = () => {
         {
           email: email.trim().toLowerCase(),
           password,
-        }
+        },
+        { withCredentials: true } 
       );
 
       // Store user data in localStorage
